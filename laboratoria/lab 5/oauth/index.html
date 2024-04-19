@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GAPI Login</title>
+
+    <meta
+      name="google-signin-client_id"
+      content="TWOJE_ID_APLIKACJI_Z_CLOUD_GOOGLE.apps.googleusercontent.com"
+    />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- google guides, dodatkowe informacje: -->
+    <!-- https://developers.google.com/identity/gsi/web/guides/overview?hl=pl -->
+    <!-- instant -->
+    <div
+      id="g_id_onload"
+      data-client_id="TWOJE_ID_APLIKACJI_Z_CLOUD_GOOGLE"
+      data-callback="handleCredentialResponse"
+    ></div>
+
+    <section id="user" class="hidden">
+      <span id="user-email"></span>
+      <img id="user-avatar" />
+    </section>
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <script type="text/javascript">
+      function handleCredentialResponse(credentials) {
+        const userData = parseJwt(credentials.credential)
+        console.log(credentials, userData)
+        document.querySelector('#user').classList.remove('hidden')
+        document.querySelector('#user-email').textContent = userData.email
+        document.querySelector('#user-avatar').src = userData.picture
+      }
+      // stackov
+      function parseJwt(token) {
+        const base64Url = token.split('.')[1]
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+        const jsonPayload = decodeURIComponent(
+          window
+            .atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        )
+
+        return JSON.parse(jsonPayload)
+      }
+    </script>
+  </body>
+</html>
